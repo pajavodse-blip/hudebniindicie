@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>Hudební indicie</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: linear-gradient(135deg, #1a1a1a, #2b2b2b);
+  color: white;
+  text-align: center;
+}
+
+header {
+  padding: 25px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 32px;
+  letter-spacing: 1px;
+}
+
+p {
+  opacity: 0.8;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 10px;
+}
+
+.lock {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 14px;
+  padding: 12px;
+  backdrop-filter: blur(6px);
+  transition: 0.3s;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.lock:hover {
+  transform: translateY(-3px);
+}
+
+.lock.unlocked {
+  background: rgba(0,255,100,0.15);
+  border: 1px solid #2ecc71;
+  box-shadow: 0 0 15px #2ecc71;
+}
+
+.question {
+  font-size: 13px;
+  margin-bottom: 10px;
+  min-height: 50px;
+}
+
+input {
+  width: 90%;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  text-align: center;
+}
+
+button {
+  margin-top: 6px;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #4a90e2;
+  color: white;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #357ab8;
+}
+
+.status {
+  font-size: 12px;
+  margin-top: 6px;
+  min-height: 18px;
+}
+
+#win {
+  display: none;
+  font-size: 28px;
+  margin: 40px;
+  color: #2ecc71;
+  text-shadow: 0 0 10px #2ecc71;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🎵 Hudební indicie</h1>
+  <p>Odemkni všechny hudební zámky a unikni</p>
+</header>
+
+<div class="grid" id="grid"></div>
+
+<div id="win">🎉 Všechny indicie odhaleny! 🎉</div>
+
+<script>
+function normalize(str) {
+  return str.toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+}
+
+const locks = [
+  { q: "Který skladatel klasicismu se narodil v Salcburku? (příjmení)", a: "Mozart" },
+  { q: "Kdo režíroval film Amadeus? (příjmení)", a: "Forman" },
+  { q: "Stát, kde vzniklo violoncello", a: "Itálie" },
+  { q: "Který smyčcová hudební nástroj je větší než housle, ale menší než violoncello?", a: "viola" },
+  { q: "Na které onemocnění zemřel Freddie Mercury?", a: "AIDS" },
+
+  { q: "Jaký je název hudební skupiny, se kterou se Freddie Mercury proslavil?", a: "Queen" },
+  { q: "Jaká hudební značka zvýší notu o půl tónu?", a: "křížek" },
+  { q: "Nota zapisuje hudební zvuk (tón), jak se nazývá značka, která zaznamenává ticho?", a: "pomlka" },
+  { q: "Která hudební forma v přísném překladu znamená \"kolečko\" nebo \"kruh\"?", a: "rondo" },
+  { q: "Doplň hudební schéma ronda: A - B - A - C - A - D - _", a: "A" },
+
+  { q: "Jak se jmenovala hudební skupina, která nazpívala \"Stánky\"?", a: "Brontosauři" },
+  { q: "Doplňte slovo: s cigaretou a s holkou, co nemá kam ...", a: "jít" },
+  { q: "Doplňte řadu: středověk ... baroko", a: "renesance" },
+  { q: "Kolik hlasů má známý kánon J. Ockeghema?", a: "36" },
+  { q: "Ve kterém roce byl položen základní kámen Národního divadla?", a: "1868" },
+  { q: "Který typ dramatu je znázorněn veselou divadení maskou?", a: "komedie" }
+];
+
+const grid = document.getElementById("grid");
+let unlocked = 0;
+
+locks.forEach((l, i) => {
+  const div = document.createElement("div");
+  div.className = "lock";
+
+  div.innerHTML = `
+    <div class="question"><b>${i+1}.</b> ${l.q}</div>
+    <input id="inp${i}" placeholder="odpověď">
+    <button onclick="check(${i})">Odemknout</button>
+    <div class="status" id="st${i}"></div>
+  `;
+
+  grid.appendChild(div);
+});
+
+function check(i) {
+  const input = document.getElementById("inp" + i).value;
+  const box = document.getElementById("st" + i);
+  const parent = box.parentElement;
+
+  if (normalize(input) === normalize(locks[i].a)) {
+    if (!parent.classList.contains("unlocked")) unlocked++;
+
+    parent.classList.add("unlocked");
+    box.textContent = "🔓 Odemčeno!";
+  } else {
+    box.textContent = "❌ Špatně";
+  }
+
+  if (unlocked === locks.length) {
+    document.getElementById("win").style.display = "block";
+  }
+}
+</script>
+
+</body>
+</html>
